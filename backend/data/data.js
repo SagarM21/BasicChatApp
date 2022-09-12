@@ -58,10 +58,6 @@ const chats = [
 		],
 		_id: "617a518c4081150716472c78",
 		chatName: "Friends",
-		groupAdmin: {
-			name: "Guest User",
-			email: "guest@gmail.com",
-		},
 	},
 	{
 		users: [
@@ -94,10 +90,6 @@ const chats = [
 		],
 		_id: "617a518c4081150016472c78",
 		chatName: "VITians",
-		groupAdmin: {
-			name: "Guest User",
-			email: "guest@gmail.com",
-		},
 	},
 ];
 
