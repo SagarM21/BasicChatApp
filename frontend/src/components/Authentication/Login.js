@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 const Login = () => {
 	const navigate = useNavigate();
 	const toast = useToast();
-	
+
 	const [email, setEmail] = useState();
 	const [show, setShow] = useState(false);
 	const [password, setPassword] = useState();

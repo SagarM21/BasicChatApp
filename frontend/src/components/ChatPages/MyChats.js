@@ -27,7 +27,7 @@ const MyChats = () => {
 			setChats(data);
 		} catch (error) {
 			toast({
-				title: "Error Occured!",
+				title: "Error Occurred!",
 				description: "Failed to Load the chats",
 				status: "error",
 				duration: 5000,
@@ -91,7 +91,7 @@ const MyChats = () => {
 								borderRadius='lg'
 								key={chat._id}
 							>
-								<Text>{getSender(loggedUser, chat.users)}</Text>
+								{/* <Text>{getSender(loggedUser, chat.users)}</Text> */}
 							</Box>
 						))}
 					</Stack>
