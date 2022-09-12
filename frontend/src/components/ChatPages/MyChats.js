@@ -40,7 +40,6 @@ const MyChats = () => {
 	useEffect(() => {
 		setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
 		fetchChats();
-		// eslint-disable-next-line
 	}, []);
 
 	return (
@@ -91,7 +90,11 @@ const MyChats = () => {
 								borderRadius='lg'
 								key={chat._id}
 							>
-								{/* <Text>{getSender(loggedUser, chat.users)}</Text> */}
+								<Text>
+									{chat.users.map((n, i) => (
+										<div>{n.name}</div>
+									))}
+								</Text>
 							</Box>
 						))}
 					</Stack>
