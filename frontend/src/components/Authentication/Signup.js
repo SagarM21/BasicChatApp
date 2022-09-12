@@ -2,18 +2,86 @@ import { Button } from "@chakra-ui/button";
 import { FormControl, FormLabel } from "@chakra-ui/form-control";
 import { Input, InputGroup, InputRightElement } from "@chakra-ui/input";
 import { VStack } from "@chakra-ui/layout";
+import { useToast } from "@chakra-ui/toast";
+import axios from "axios";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
+	const toast = useToast();
+	const navigate = useNavigate();
+
 	const [show, setShow] = useState(false);
 	const [name, setName] = useState();
 	const [email, setEmail] = useState();
 	const [confirmPassword, setConfirmPassword] = useState();
 	const [password, setPassword] = useState();
-	const [pic, setPic] = useState();
-	const [picLoading, setPicLoading] = useState(false);
+	const [loading, setLoading] = useState(false);
 
-	const submitHandler = () => {};
+	const submitHandler = async () => {
+		setLoading(true);
+		if (!name || !email || !password || !confirmPassword) {
+			toast({
+				title: "Please fill all the fields.",
+				status: "warning",
+				duration: 5000,
+				isClosable: true,
+				position: "bottom",
+			});
+			setLoading(false);
+			return;
+		}
+
+		if (password !== confirmPassword) {
+			toast({
+				title: "Passwords do dot match.",
+				status: "warning",
+				duration: 5000,
+				isClosable: true,
+				position: "bottom",
+			});
+			return;
+		}
+		// console.log(name, email, password, pic);
+
+		try {
+			const config = {
+				headers: {
+					"Content-type": "application/json",
+				},
+			};
+			const { data } = await axios.post(
+				"/api/user",
+				{
+					name,
+					email,
+					password,
+				},
+				config
+			);
+			// console.log(data);
+			toast({
+				title: "Registration Successful",
+				status: "success",
+				duration: 5000,
+				isClosable: true,
+				position: "bottom",
+			});
+			localStorage.setItem("userInfo", JSON.stringify(data));
+			setLoading(false);
+			navigate("/chats");
+		} catch (error) {
+			toast({
+				title: "Error occurred!",
+				description: error.response.data.message,
+				status: "error",
+				duration: 5000,
+				isClosable: true,
+				position: "bottom",
+			});
+			setLoading(false);
+		}
+	};
 	return (
 		<VStack spacing='5px'>
 			<FormControl id='first-name' isRequired>
@@ -75,10 +143,6 @@ const Signup = () => {
 				</InputGroup>
 			</FormControl>
 
-			<FormControl id='pic'>
-				<FormLabel>Upload your Picture</FormLabel>
-				<Input type='file' p={1.5} accept='image/*' />
-			</FormControl>
 			<Button
 				colorScheme='blue'
 				width='100%'

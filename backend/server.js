@@ -4,6 +4,7 @@ const chats = require("./data/data");
 const cors = require("cors");
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
+const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
 const app = express();
 app.use(cors());
@@ -11,7 +12,7 @@ dotenv.config();
 connectDB();
 
 // accepts the json data
-app.use(express.json())
+app.use(express.json());
 
 app.get("/", (req, res) => {
 	res.send("API is running");
@@ -27,6 +28,10 @@ app.get("/", (req, res) => {
 // });
 
 app.use("/api/user", userRoutes);
+
+// for the errors
+app.use(notFound);
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
