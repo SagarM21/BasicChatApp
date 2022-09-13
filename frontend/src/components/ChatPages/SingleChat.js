@@ -1,9 +1,15 @@
 import { ChatState } from "../../Context/ChatProvider";
 import ProfileModal from "./ProfileModal";
 import { FormControl } from "@chakra-ui/form-control";
-import { Input } from "@chakra-ui/input";
+import { Input, InputGroup, InputRightElement } from "@chakra-ui/input";
 import { Box, Text } from "@chakra-ui/layout";
-import { IconButton, Spinner, useToast } from "@chakra-ui/react";
+import {
+	Button,
+	IconButton,
+	SelectField,
+	Spinner,
+	useToast,
+} from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { getSender, getSenderFull } from "../../config/ChatLogics";
 import { useEffect, useState } from "react";
@@ -18,12 +24,15 @@ const ENDPOINT = "http://localhost:5000";
 var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
+	// const [show, setShow] = useState(false);
 	const [messages, setMessages] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [newMessage, setNewMessage] = useState();
 	const [socketConnected, setSocketConnected] = useState(false);
 	const [isTyping, setIsTyping] = useState(false);
 	const [typing, setTyping] = useState(false);
+	const [file, setFile] = useState(null);
+	const [pdfFileError, setPdfFileError] = useState("");
 	const { user, selectedChat, setSelectedChat, notification, setNotification } =
 		ChatState();
 
@@ -107,6 +116,26 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 	});
 
 	const sendMessage = async (event) => {
+		// if (file) {
+		// 	const messageObject = {
+		// 		id: selectedChat,
+		// 		type: "file",
+		// 		body: "file",
+		// 		mimeType: file.type,
+		// 		fileName: file.name,
+		// 	};
+		// 	setMessages("");
+		// 	setFile();
+		// 	socket.emit("new message", messageObject);
+		// 	setMessages([...messages, messageObject]);
+		// }
+
+		if (file !== null) {
+			setFile(file);
+		} else {
+			setFile(null);
+		}
+
 		if (event.key === "Enter" && newMessage) {
 			socket.emit("stop typing", selectedChat._id);
 			try {
@@ -168,6 +197,28 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 			}
 		}, timeLength);
 	};
+
+	const fileType = ["application/pdf"];
+	const handlePdfFileChange = (e) => {
+		let selectedFile = e.target.files[0];
+		if (selectedFile) {
+			if (selectedFile && fileType.includes(selectedFile.type)) {
+				let reader = new FileReader();
+				reader.readAsDataURL(selectedFile);
+				reader.onloadend = (e) => {
+					setFile(e.target.result);
+					setPdfFileError("");
+				};
+				console.log(reader);
+			} else {
+				setFile(null);
+				setPdfFileError("Please select valid pdf file");
+			}
+		} else {
+			console.log("select your file");
+		}
+	};
+
 	return (
 		<>
 			{selectedChat ? (
@@ -238,13 +289,24 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 								<></>
 							)}
 
-							<Input
-								variant='filled'
-								bg='#E0E0E0'
-								placeholder='Enter a message..'
-								value={newMessage}
-								onChange={typingHandler}
-							/>
+							<InputGroup>
+								<Input
+									variant='filled'
+									bg='#E0E0E0'
+									placeholder='Enter a message..'
+									value={newMessage}
+									onChange={typingHandler}
+								/>
+								<InputRightElement width='6rem'>
+									<Input
+										h='1.75rem'
+										size='sm'
+										type='file'
+										accept='.pdf'
+										onChange={handlePdfFileChange}
+									/>
+								</InputRightElement>
+							</InputGroup>
 						</FormControl>
 					</Box>
 				</>
