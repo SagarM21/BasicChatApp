@@ -8,6 +8,8 @@ import { ArrowBackIcon } from "@chakra-ui/icons";
 import { getSender, getSenderFull } from "../../config/ChatLogics";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import "../style.css";
+import ChatUI from "./ChatUI";
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 	const [messages, setMessages] = useState([]);
@@ -33,6 +35,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 				`/api/message/${selectedChat._id}`,
 				config
 			);
+			// console.log(messages);
 			setMessages(data);
 			setLoading(false);
 		} catch (error) {
@@ -134,7 +137,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 								margin='auto'
 							/>
 						) : (
-							<div>{/* messages */}</div>
+							<div className='messages'>
+								<ChatUI messages={messages} />
+							</div>
 						)}
 
 						<FormControl
