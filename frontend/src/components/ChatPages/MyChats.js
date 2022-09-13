@@ -92,7 +92,7 @@ const MyChats = () => {
 							>
 								<Text>
 									{chat.users.map((n, i) => (
-										<div>{n.name}</div>
+										<div key={i}>{n.name}</div>
 									))}
 								</Text>
 							</Box>
