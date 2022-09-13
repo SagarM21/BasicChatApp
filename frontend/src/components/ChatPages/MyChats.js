@@ -94,7 +94,7 @@ const MyChats = ({ fetchAgain }) => {
 									{/* {chat.users.map((n, i) => (
 										<div key={i}>{n.name}</div>
 									))} */}
-									{getSender(setLoggedUser, chat.users)}
+									{getSender(loggedUser, chat.users)}
 								</Text>
 							</Box>
 						))}
