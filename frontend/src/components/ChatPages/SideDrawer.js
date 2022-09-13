@@ -26,9 +26,11 @@ import ChatLoading from "./ChatLoading";
 import { Spinner } from "@chakra-ui/spinner";
 import { getSender } from "../../config/ChatLogics";
 import { ChatState } from "../../Context/ChatProvider";
-import { Avatar } from "@chakra-ui/react";
+import { Avatar, effect } from "@chakra-ui/react";
 import ProfileModal from "./ProfileModal";
 import UserListItem from "../../List/UserListItem";
+import NotificationBadge from "react-notification-badge";
+import { Effect } from "react-notification-badge";
 
 function SideDrawer() {
 	const [search, setSearch] = useState("");
@@ -145,9 +147,28 @@ function SideDrawer() {
 				<div>
 					<Menu>
 						<MenuButton p={1}>
+							<NotificationBadge
+								count={notification.length}
+								effect={Effect.SCALE}
+							/>
 							<BellIcon fontSize='2xl' m={1} />
 						</MenuButton>
-						{/* Menu list to be created */}
+						<MenuList pl={2}>
+							{!notification.length && "No new messages"}
+							{notification.map((n) => (
+								<MenuItem
+									key={n._id}
+									onClick={() => {
+										setSelectedChat(n.chat);
+										setNotification(
+											notification.filter((notify) => notify !== n)
+										);
+									}}
+								>
+									{`New message from ${getSender(user, n.chat.users)}`}
+								</MenuItem>
+							))}
+						</MenuList>
 					</Menu>
 					<Menu>
 						<MenuButton as={Button} bg='white' rightIcon={<ChevronDownIcon />}>
