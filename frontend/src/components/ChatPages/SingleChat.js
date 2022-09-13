@@ -10,11 +10,16 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import "../style.css";
 import ChatUI from "./ChatUI";
+import io from "socket.io-client";
+
+const ENDPOINT = "http://localhost:5000";
+var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 	const [messages, setMessages] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [newMessage, setNewMessage] = useState();
+	const [socketConnected, setSocketConnected] = useState(false);
 	const { user, selectedChat, setSelectedChat } = ChatState();
 
 	const toast = useToast();
@@ -38,6 +43,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 			// console.log(messages);
 			setMessages(data);
 			setLoading(false);
+
+			socket.emit("join chat", selectedChat._id);
 		} catch (error) {
 			toast({
 				title: "Error Occurred!",
@@ -53,6 +60,13 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 	useEffect(() => {
 		fetchMessages();
 	}, [selectedChat]);
+
+	useEffect(() => {
+		socket = io(ENDPOINT);
+		socket.emit("setup", user);
+
+		socket.on("connection", () => setSocketConnected(true));
+	}, []);
 
 	const sendMessage = async (event) => {
 		if (event.key === "Enter" && newMessage) {
