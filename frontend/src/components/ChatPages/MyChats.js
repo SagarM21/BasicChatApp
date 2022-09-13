@@ -7,7 +7,7 @@ import { getSender } from "../../config/ChatLogics";
 import ChatLoading from "../ChatPages/ChatLoading";
 import { ChatState } from "../../Context/ChatProvider";
 
-const MyChats = () => {
+const MyChats = ({ fetchAgain }) => {
 	const [loggedUser, setLoggedUser] = useState();
 
 	const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
@@ -40,7 +40,7 @@ const MyChats = () => {
 	useEffect(() => {
 		setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
 		fetchChats();
-	}, []);
+	}, [fetchAgain]);
 
 	return (
 		<Box
@@ -91,9 +91,10 @@ const MyChats = () => {
 								key={chat._id}
 							>
 								<Text>
-									{chat.users.map((n, i) => (
+									{/* {chat.users.map((n, i) => (
 										<div key={i}>{n.name}</div>
-									))}
+									))} */}
+									{getSender(setLoggedUser, chat.users)}
 								</Text>
 							</Box>
 						))}
