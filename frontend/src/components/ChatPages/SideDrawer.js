@@ -159,8 +159,9 @@ function SideDrawer() {
 							/>
 						</MenuButton>
 						<MenuList>
-							<MenuItem>My Profile</MenuItem>
-							<ProfileModal user={user} />
+							<ProfileModal user={user}>
+								<MenuItem>My Profile</MenuItem>{" "}
+							</ProfileModal>
 							<MenuDivider />
 							<MenuItem onClick={logoutHandler}>Logout</MenuItem>
 						</MenuList>
