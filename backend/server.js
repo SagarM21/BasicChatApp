@@ -7,6 +7,7 @@ const userRoutes = require("./routes/userRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const messageRoute = require("./routes/messageRoute");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
+const path = require("path");
 
 const app = express();
 app.use(cors());
@@ -16,13 +17,23 @@ connectDB();
 // accepts the json data
 app.use(express.json());
 
-app.get("/", (req, res) => {
-	res.send("API is running");
-});
-
 app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/message", messageRoute);
+
+// DEPLOY
+const __dirname1 = path.resolve();
+if (process.env.NODE_ENV === "production") {
+	app.use(express.static(path.join(__dirname1, "/frontend/build")));
+
+	app.get("*", (req, res) => {
+		res.sendFile(path.resolve(__dirname1, "frontend", "build", "index.html"));
+	});
+} else {
+	app.get("/", (req, res) => {
+		res.send("API is running");
+	});
+}
 
 // for the errors
 app.use(notFound);

@@ -20,7 +20,11 @@ import io from "socket.io-client";
 import Lottie from "react-lottie";
 import animationData from "../../typingAnimation/typing.json";
 
-const ENDPOINT = "http://localhost:5000";
+// while developing
+// const ENDPOINT = "http://localhost:5000";
+
+// in production
+const ENDPOINT = "https://talkrandomly.herokuapp.com/";
 var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
