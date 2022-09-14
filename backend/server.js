@@ -1,6 +1,9 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const chats = require("./data/data");
+const multer = require("multer");
+const AWS = require("aws-sdk");
+const uuid = require("uuidv4");
 const cors = require("cors");
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
@@ -20,6 +23,41 @@ app.use(express.json());
 app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/message", messageRoute);
+
+// AWS CODE
+const s3 = new AWS.S3({
+	credentials: {
+		accessKeyId: process.env.AWS_ACCESS_KEY,
+		secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+	},
+});
+
+const storage = multer.memoryStorage({
+	destination: function (req, file, callback) {
+		callback(null, "");
+	},
+});
+
+const upload = multer({ storage }).single("pdf");
+
+app.post("/upload", upload, (req, res) => {
+	let myFile = req.file.originalname.split(".");
+	const fileType = myFile[myFile.length - 1];
+
+	const params = {
+		Bucket: process.env.AWS_BUCKET_NAME,
+		Key: `${uuid}.${fileType}`,
+		Body: req.file.buffer,
+	};
+
+	s3.upload(params, (error, data) => {
+		if (error) {
+			res.status(500).send(error);
+		}
+
+		res.status(200).send(data);
+	});
+});
 
 // DEPLOY
 const __dirname1 = path.resolve();
