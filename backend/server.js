@@ -3,7 +3,7 @@ const dotenv = require("dotenv");
 const chats = require("./data/data");
 const multer = require("multer");
 const AWS = require("aws-sdk");
-const uuid = require("uuidv4");
+const { uuid } = require("uuidv4");
 const cors = require("cors");
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
@@ -46,7 +46,7 @@ app.post("/upload", upload, (req, res) => {
 
 	const params = {
 		Bucket: process.env.AWS_BUCKET_NAME,
-		Key: `${uuid}.${fileType}`,
+		Key: `${uuid()}.${fileType}`,
 		Body: req.file.buffer,
 	};
 
