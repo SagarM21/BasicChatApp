@@ -19,12 +19,13 @@ import ChatUI from "./ChatUI";
 import io from "socket.io-client";
 import Lottie from "react-lottie";
 import animationData from "../../typingAnimation/typing.json";
+import "../style.css";
 
 // while developing
-// const ENDPOINT = "http://localhost:5000";
+const ENDPOINT = "http://localhost:5000";
 
 // in production
-const ENDPOINT = "https://talkrandomly.herokuapp.com/";
+// const ENDPOINT = "https://talkrandomly.herokuapp.com/";
 var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
@@ -35,7 +36,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 	const [socketConnected, setSocketConnected] = useState(false);
 	const [isTyping, setIsTyping] = useState(false);
 	const [typing, setTyping] = useState(false);
-	const [file, setFile] = useState(null);
+	const [file, setFile] = useState([]);
 	const [pdfFileError, setPdfFileError] = useState("");
 	const { user, selectedChat, setSelectedChat, notification, setNotification } =
 		ChatState();
@@ -159,7 +160,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 					config
 				);
 
-				console.log(data);
+				// console.log(data);
 
 				socket.emit("new message", data);
 				setMessages([...messages, data]);
@@ -202,25 +203,60 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 		}, timeLength);
 	};
 
+	const pdfSubmit = async (e) => {
+		e.preventDefault();
+		const file = e.target.files[0];
+
+		const { url } = await fetch("/s3Url").then((res) => res.json());
+		console.log(url);
+
+		// post the image directly to the s3 bucket
+		await fetch(url, {
+			method: "PUT",
+			headers: {
+				"Content-Type": "multipart/form-data",
+			},
+			body: file,
+		});
+
+		const imageUrl = url.split("?")[0];
+		console.log(imageUrl);
+	};
+
 	const fileType = ["application/pdf"];
 	const handlePdfFileChange = (e) => {
-		let selectedFile = e.target.files[0];
-		if (selectedFile) {
-			if (selectedFile && fileType.includes(selectedFile.type)) {
-				let reader = new FileReader();
-				reader.readAsDataURL(selectedFile);
-				reader.onloadend = (e) => {
-					setFile(e.target.result);
-					setPdfFileError("");
-				};
-				console.log(reader);
-			} else {
-				setFile(null);
-				setPdfFileError("Please select valid pdf file");
+		let selectedFile = Array.from(e.target.files);
+
+		selectedFile.forEach((f) => {
+			if (f !== "application/pdf") {
+				setPdfFileError(`${f.name} format is unsupported.`);
+				selectedFile = selectedFile.filter((item) => item.name !== f.name);
+				return;
 			}
-		} else {
-			console.log("select your file");
-		}
+			const reader = new FileReader();
+			reader.readAsDataURL(f);
+			reader.onload = (readerEvent) => {
+				setFile((pdfF) => [...pdfF, readerEvent.target.result]);
+			};
+			console.log(reader);
+		});
+
+		// if (selectedFile) {
+		// 	if (selectedFile && fileType.includes(selectedFile.type)) {
+		// 		let reader = new FileReader();
+		// 		reader.readAsDataURL(selectedFile);
+		// 		reader.onload = (readerEvent) => {
+		// 			setFile((files) => [...files, readerEvent.target.result]);
+		// 			setPdfFileError("");
+		// 		};
+		// 		console.log(reader);
+		// 	} else {
+		// 		setFile(null);
+		// 		setPdfFileError("Please select valid pdf file");
+		// 	}
+		// } else {
+		// 	console.log("select your file");
+		// }
 	};
 
 	return (
@@ -309,6 +345,15 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 										accept='.pdf'
 										onChange={handlePdfFileChange}
 									/>
+									{file && file.length ? (
+										<div>
+											{file.map((f, i) => (
+												<img src='' alt='' />
+											))}
+										</div>
+									) : (
+										""
+									)}
 								</InputRightElement>
 							</InputGroup>
 						</FormControl>

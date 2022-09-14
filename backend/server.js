@@ -9,8 +9,10 @@ const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const messageRoute = require("./routes/messageRoute");
+const uploadRoute = require("./routes/uploadRoute");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
-const path = require("path");
+// const path = require("path");
+// const { generateUploadURL } = require("./s3");
 
 const app = express();
 app.use(cors());
@@ -23,55 +25,32 @@ app.use(express.json());
 app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/message", messageRoute);
+app.use("/api/upload", uploadRoute);
 
-// AWS CODE
-const s3 = new AWS.S3({
-	credentials: {
-		accessKeyId: process.env.AWS_ACCESS_KEY,
-		secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-	},
-});
+// AWS ANOTHER METHOD -- NOT WORKING
 
-const storage = multer.memoryStorage({
-	destination: function (req, file, callback) {
-		callback(null, "");
-	},
-});
+// app.get("/s3Url", async (req, res) => {
+// 	const url = await s3.generateUploadURL();
+// 	res.send({ url });
+// });
 
-const upload = multer({ storage }).single("pdf");
-
-app.post("/upload", upload, (req, res) => {
-	let myFile = req.file.originalname.split(".");
-	const fileType = myFile[myFile.length - 1];
-
-	const params = {
-		Bucket: process.env.AWS_BUCKET_NAME,
-		Key: `${uuid()}.${fileType}`,
-		Body: req.file.buffer,
-	};
-
-	s3.upload(params, (error, data) => {
-		if (error) {
-			res.status(500).send(error);
-		}
-
-		res.status(200).send(data);
-	});
-});
+// AWS ANOTHER METHOD -- ENDS
 
 // DEPLOY
-const __dirname1 = path.resolve();
-if (process.env.NODE_ENV === "production") {
-	app.use(express.static(path.join(__dirname1, "/frontend/build")));
+// const __dirname1 = path.resolve();
+// if (process.env.NODE_ENV === "production") {
+// 	app.use(express.static(path.join(__dirname1, "/frontend/build")));
 
-	app.get("*", (req, res) => {
-		res.sendFile(path.resolve(__dirname1, "frontend", "build", "index.html"));
-	});
-} else {
-	app.get("/", (req, res) => {
-		res.send("API is running");
-	});
-}
+// 	app.get("*", (req, res) => {
+// 		res.sendFile(path.resolve(__dirname1, "frontend", "build", "index.html"));
+// 	});
+// } else {
+// 	app.get("/", (req, res) => {
+// 		res.send("API is running");
+// 	});
+// }
+
+// DEPLOY ENDS
 
 // for the errors
 app.use(notFound);
