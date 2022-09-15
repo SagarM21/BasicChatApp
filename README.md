@@ -7,11 +7,13 @@
 # Features
 
 - JWT Authentication(Login/SignUp/Logout)
+- Passwords are encrypted
 - Profile Modal
-- Realtime chat using socket.io
+- Realtime chat using socket.io, chat is saved in mongoDB
 - Used Chakra-ui for the frontend
 - Used context api for state management
 - Notification when new message arrives
+- Handling errors
 
 # Demo Screenshots
 ![chat](https://user-images.githubusercontent.com/72984307/189872690-2c9a1aba-54ca-48c6-9bd4-2b4ff5c71508.png)
